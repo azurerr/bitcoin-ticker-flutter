@@ -9,7 +9,32 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
+  String selectedCurrency = 'CAD';
+  String coin = 'BTC';
+  double price = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getPrice();
+  }
+
+  void getPrice() async {
+    CoinData coinData = CoinData();
+    //print(price);
+    try {
+      var priceData =
+          await coinData.getCurrency(coin: coin, currency: selectedCurrency);
+      print(priceData);
+
+      setState(() {
+        price = priceData['$coin']['$selectedCurrency'];
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -26,6 +51,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getPrice();
         });
       },
     );
@@ -43,18 +69,19 @@ class _PriceScreenState extends State<PriceScreen> {
       onSelectedItemChanged: (value) {
         selectedCurrency = currenciesList[value];
         print(selectedCurrency);
+        getPrice();
       },
       children: pickerItems,
     );
   }
 
-  Widget getPicker() {
-    if (Platform.isIOS) {
-      return iOSPicker();
-    } else if (Platform.isAndroid) {
-      return androidDropdown();
-    }
-  }
+  // Widget getPicker() {
+  //   if (Platform.isIOS) {
+  //     return iOSPicker();
+  //   } else if (Platform.isAndroid) {
+  //     return androidDropdown();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +104,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $price $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,

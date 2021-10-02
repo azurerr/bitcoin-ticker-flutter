@@ -10,8 +10,9 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'CAD';
-  String coin = 'BTC';
-  double price = 0;
+  //String coin = 'BTC';
+  String price = '?';
+  Map<String, String> coinPrices = {};
 
   @override
   void initState() {
@@ -24,12 +25,12 @@ class _PriceScreenState extends State<PriceScreen> {
     CoinData coinData = CoinData();
     //print(price);
     try {
-      var priceData =
-          await coinData.getCurrency(coin: coin, currency: selectedCurrency);
-      print(priceData);
-
+      var priceData = await coinData.getCurrency(currency: selectedCurrency);
       setState(() {
-        price = priceData['$coin']['$selectedCurrency'];
+        for (String crypto in cryptoList) {
+          coinPrices['$crypto'] =
+              priceData['$crypto']['$selectedCurrency'].toStringAsFixed(1);
+        }
       });
     } catch (e) {
       print(e);
@@ -75,6 +76,34 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
+  Column coinCards() {
+    List<Card> cards = [];
+    for (String crypto in cryptoList) {
+      cards.add(Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $crypto = ${coinPrices[crypto]} $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: cards,
+    );
+  }
+
   // Widget getPicker() {
   //   if (Platform.isIOS) {
   //     return iOSPicker();
@@ -95,24 +124,7 @@ class _PriceScreenState extends State<PriceScreen> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = $price $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+            child: coinCards(),
           ),
           Container(
             height: 150.0,

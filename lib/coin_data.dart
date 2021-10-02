@@ -37,7 +37,7 @@ const apiKey =
 //https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD,JPY,EUR
 
 class CoinData {
-  Future<dynamic> getCurrency({String coin, String currency}) async {
+  Future<dynamic> getCurrency({String currency}) async {
     NetworkHelper networkHelper = NetworkHelper(
         '$coinUrl?fsyms=${cryptoList[0]},${cryptoList[1]},${cryptoList[2]}&tsyms=$currency&api_key=$apiKey');
     var data = await networkHelper.getData();
